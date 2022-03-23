@@ -9,10 +9,27 @@ For details, please see [Magnetic Field Prediction Using Generative Adversarial 
 
 ## Quick start with conda
 
+### Installation
 ```bash
 conda install -y matplotlib pyyaml scipy scikit-learn scikit-image tensorboard notebook conda-build
 ```
 - Install [PyTorch](https://pytorch.org/get-started/locally/)
+
+### Reproduce results of paper
+For different bounding box amounts and mask sizes. As methods, the baseline WGAN-GP, our physics-informed WGAN-GP, linear interpolation, spline-based interpolation, and biharmonic equations can be chosen. Trained generator networks can be found [here](magfield-prediction/checkpoints/). For outpainting, Gaussian Process Regression is available.
+In addition to the pre-trained model from the paper, five sample magnetic fields are included in the data folder to be able to run predcitions.
+
+- Inpainting
+
+    ```bash
+    python test.py --name in_ext_div_curl_1_144_1 --exp paper --cfg_file test_in.yaml --box_amount 1 --mask_size 144 --method wgan
+    ````
+
+- Outpainting
+
+    ```bash
+    python test.py --name out_one_div_curl_20_1_1 --exp paper --cfg_file test_out.yaml --box_amount 20 --mask_size 1 --method wgan
+    ```
 
 
 ## Data generation with MagTense
@@ -38,12 +55,4 @@ After the magnetic field data has been produced. A new generator can be trained.
 
 ```bash
 python train.py
-```
-
-## Prediction and evaluation
-
-Run prediction with a number of samples for different bounding box amounts and mask sizes. As methods, the baseline WGAN-GP, our physics-informed WGAN-GP, linear interpolation, spline-based interpolation, and biharmonic equations can be chosen for the inpainting task. For outpainting, Gaussian Process Regression is available.
-
-```bash
-python test.py
 ```

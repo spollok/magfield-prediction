@@ -1,4 +1,3 @@
-#%%
 import os
 import itertools
 import pandas as pd
@@ -8,6 +7,7 @@ import matplotlib.colors as colors
 
 from pathlib import Path
 from datetime import datetime
+from argparse import ArgumentParser
 from scipy.interpolate import griddata, bisplrep, bisplev
 from skimage.restoration import inpaint
 from sklearn import preprocessing
@@ -22,16 +22,39 @@ from model.networks import Generator
 from utils.tools import calc_div, calc_curl, random_bbox, mask_image
 from utils.tools import field_loader, get_config, get_model_list
 
+parser = ArgumentParser()
+parser.add_argument('--name', type=str, default='in_ext_div_curl_1_144_1', 
+    help='manual seed')
+parser.add_argument('--exp', type=str, default='paper',
+    help='manual seed')
+parser.add_argument('--cfg_file', type=str, default='test.yaml',
+    help='Path to test configuration')
+parser.add_argument('--num_samples', type=int, default=5,
+    help='Number of samples to predict')
+parser.add_argument('--box_amount', type=int, default=None,
+    help='Number of bounding boxes as mask')
+parser.add_argument('--mask_size', type=int, default=None,
+    help='Size of the bounding boxes')
+parser.add_argument('--method', type=str, default='wgan',
+    help='Method to use for predicting missing values')
+parser.add_argument('--lab', type=bool, default=False,
+    help='Use lab setup')
+parser.add_argument('--plot', type=bool, default=True,
+    help='Plot results')
+parser.add_argument('--save', type=bool, default=False,
+    help='Save results as pandas DataFrame')
+
 
 def predict(
     name,
     exp='foo',
+    cfg_file='test.yaml',
     num_samples=100,
     plot=False,
     err_min=0,
     err_max=256,
-    err_scale=0.005,
-    plot_scale=0.01,
+    err_scale=0.01,
+    plot_scale=0.04,
     box_amount=None,
     mask_size=None,
     mask_distributed=False,
@@ -50,13 +73,8 @@ def predict(
     df_eval = pd.DataFrame([], columns=['loss', 'loss_pct', 'div', 'curl'])
 
     for i in range(num_samples):
-        # Loading config file
-        cfg_name = exp
-        if lab: cfg_name += '_lab'
-        # Test config
-        cfg_path = Path(__file__).parent.resolve() / 'configs' / 'test.yaml'
+        cfg_path=Path(__file__).parent.resolve() / 'configs' / cfg_file
         config = get_config(cfg_path)
-
         # Setting additional configuration
         if box_amount is not None:
             config['box_amount'] = box_amount
@@ -107,7 +125,7 @@ def predict(
                                                      "gen", best=True)
                 else:
                     last_model_name = get_model_list(checkpoint_path, "gen",
-                                                     iteration=config['resume'])                
+                                                     iteration=config['resume'])
                 netG.load_state_dict(torch.load(last_model_name))
 
                 if cuda:
@@ -177,6 +195,9 @@ def predict(
                 mask_pre = mask.squeeze(0).squeeze(0).cpu().data.numpy()
                 x_post = inpaint.inpaint_biharmonic(x_pre, mask_pre, multichannel=True)
                 x2 = torch.from_numpy(x_post).permute((2,0,1)).unsqueeze(0)
+
+            else:
+                raise NotImplementedError(f'Method {method} is currently not supported')
 
             # Add prediction to known field points
             # Outpaint: Take whole prediction
@@ -575,22 +596,21 @@ def plot_eval(
                 plt.title(f'Multiple masks')
                 plt.xlabel('Mask amount')
                 plt.xticks(box_amount)
-                plt.savefig(f'{output_path}/plots/amount_{timestamp}_{metric}.png')
-#%%        
+                plt.savefig(f'{output_path}/plots/amount_{timestamp}_{metric}.png')    
 
 
 if __name__ == '__main__':
+    args = parser.parse_args()
+
     predict(
-        exp='foo_256',
-        name='in_ext_div_curl_1_96_1',
-        num_samples=5,
-        box_amount=2,
-        mask_size=96,
-        method='wgan',
-        # eval_idx=10,
-        # lab=True,
-        plot=True,
-        plot_scale=0.04,
-        err_scale=0.01,
-        # save=True,
+        exp=args.exp,
+        name=args.name,
+        cfg_file=args.cfg_file,
+        num_samples=args.num_samples,
+        box_amount=args.box_amount,
+        mask_size=args.mask_size,
+        method=args.method,
+        lab=args.lab,
+        plot=args.plot,
+        save=args.save,
     )

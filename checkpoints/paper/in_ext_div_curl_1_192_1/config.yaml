@@ -1,0 +1,54 @@
+# data parameters
+dataset_name: paper
+train_data: paper_256
+val_data: paper_256
+test: False
+resume:
+batch_size: 25
+image_shape: [3, 256, 256]
+mask_shape: [144, 144]
+mask_batch_same: True
+max_delta_shape: [24,24]
+margin: [4, 4]
+div_loss: True
+curl_loss: True
+
+# Costum parameter for magnetic field prediction
+box_amount: 1
+box_patch: 16
+mode: extend
+outpaint: False
+scale_factor: 1
+
+# training parameters
+cuda: True
+gpu_ids: [1]
+num_workers: 48
+lr: 0.0001
+beta1: 0.5
+beta2: 0.9
+n_critic: 5
+niter: 400000
+print_iter: 1000
+viz_iter: 5000
+snapshot_save_iter: 10000
+valid_iter: 2500
+
+# loss weight
+coarse_l1_alpha: 1.2
+l1_loss_alpha: 3.6
+ae_loss_alpha: 7.2
+global_wgan_loss_alpha: 1.
+gan_loss_alpha: 0.001
+wgan_gp_lambda: 10
+div_loss_alpha: 500
+curl_loss_alpha: 30000
+
+# network parameters
+netG:
+  input_dim: 3
+  ngf: 32
+
+netD:
+  input_dim: 3
+  ndf: 64

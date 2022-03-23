@@ -3,8 +3,11 @@
 .vscode/
 
 # Data, Plots, and Results
-checkpoints/
+checkpoints/*
+!checkpoints/paper/
+checkpoints/paper/*/test
 data/*
+!data/paper_256
 !data/test_lab_96_measured/
 plots/
 results/
