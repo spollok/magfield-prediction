@@ -17,19 +17,23 @@ conda install -y matplotlib pyyaml scipy scikit-learn scikit-image tensorboard n
 
 ### Reproduce results of paper
 For different bounding box amounts and mask sizes. As methods, the baseline WGAN-GP, our physics-informed WGAN-GP, linear interpolation, spline-based interpolation, and biharmonic equations can be chosen. Trained generator networks can be found [here](https://github.com/spollok/magfield-prediction/tree/main/checkpoints/paper). For outpainting, Gaussian Process Regression is available.
-In addition to the pre-trained model from the paper, five sample magnetic fields are included in the data folder to be able to run predcitions.
+In addition to the pre-trained models, which have been used in the paper, five sample magnetic fields are included in the data folder to be able to directly run predictions. The visualization of the results can then be found in the folder checkpoints/***exp***/***name***/test/figs.
 
-- Inpainting
+- Inpainting with one mask of resolution 144 x 144
 
     ```bash
-    python test.py --name in_ext_div_curl_1_144_1 --box_amount 1 --mask_size 144 --method wgan --exp paper --cfg_file test_in.yaml
+    python test.py --name in_ext_div_curl_1_144_1 --box_amount 1 --mask_size 144 --method wgan --err_scale 0.01 --exp paper --cfg_file test_in.yaml
     ````
 
-- Outpainting
+    ![Inpainting with one mask of resolution 144x144](checkpoints/paper/in_ext_div_curl_1_144_1/1_144_3_wgan.png)
+
+- Outpainting from 20 magnetic field values
 
     ```bash
-    python test.py --name out_one_div_curl_20_1_1 --box_amount 20 --mask_size 1 --method wgan --exp paper --cfg_file test_out.yaml
+    python test.py --name out_one_div_curl_20_1_1 --box_amount 20 --mask_size 1 --method wgan --err_scale 0.03 --exp paper --cfg_file test_out.yaml
     ```
+
+    ![Outpainting with 20 pixel values given](checkpoints/paper/out_one_div_curl_20_1_1/20_1_2_wgan.png)
 
 
 ## Data generation with MagTense

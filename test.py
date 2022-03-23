@@ -35,6 +35,8 @@ parser.add_argument('--box_amount', type=int, default=None,
     help='Number of bounding boxes as mask')
 parser.add_argument('--mask_size', type=int, default=None,
     help='Size of the bounding boxes')
+parser.add_argument('--err_scale', type=float, default=None,
+    help='Scale of error colorbar')
 parser.add_argument('--method', type=str, default='wgan',
     help='Method to use for predicting missing values')
 parser.add_argument('--lab', type=bool, default=False,
@@ -54,7 +56,7 @@ def predict(
     err_min=0,
     err_max=256,
     err_scale=0.01,
-    plot_scale=0.04,
+    plot_scale=0.05,
     box_amount=None,
     mask_size=None,
     mask_distributed=False,
@@ -612,5 +614,6 @@ if __name__ == '__main__':
         method=args.method,
         lab=args.lab,
         plot=args.plot,
+        err_scale=args.err_scale,
         save=args.save,
     )
