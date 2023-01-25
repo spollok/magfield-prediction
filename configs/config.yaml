@@ -1,12 +1,12 @@
 # data parameters
-dataset_name: foo_256
-train_data: viz_256
-val_data: viz_test_256
+dataset_name: boundary_1_256
+train_data: paper_256
+val_data: paper_256
 test: False
 resume:
-batch_size: 10
+batch_size: 2
 image_shape: [3, 256, 256]
-mask_shape: [96, 96]
+mask_shape: [94, 94]
 mask_batch_same: True
 max_delta_shape: [16,16]
 margin: [4, 4]
@@ -14,9 +14,10 @@ div_loss: True
 curl_loss: True
 
 # Costum parameter for magnetic field prediction
+boundary: 1
 box_amount: 1
 box_patch: 4
-mode: extend
+mode: inpaint
 outpaint: False
 scale_factor: 1
 
@@ -28,9 +29,9 @@ lr: 0.0001
 beta1: 0.5
 beta2: 0.9
 n_critic: 5
-niter: 20000
-print_iter: 1000
-viz_iter: 5000
+niter: 100
+print_iter: 10
+viz_iter: 5
 snapshot_save_iter: 10000
 valid_iter: 2500
 

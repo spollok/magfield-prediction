@@ -156,7 +156,7 @@ def random_bbox(config, distributed=False, seed=None):
 def bbox2mask(bboxes, height, width, max_delta_h, max_delta_w, bnd, outpaint=False):
     batch_size = bboxes.size(0)
     if bnd is not None:
-        mask_size = (batch_size, 1, bbox[2] + 2 * bnd, bbox[3] + 2 * bnd)
+        mask_size = (batch_size, 1, int(bboxes[0,0][2] + 2 * bnd), int(bboxes[0,0][3] + 2 * bnd))
     else:
         mask_size = (batch_size, 1, height, width)
 
@@ -253,10 +253,19 @@ def local_patch(x, bboxes, s, outpaint, mode):
 def mask_image(x, bboxes, config, bnd=None):
     _, height, width = config['image_shape']
     max_delta_h, max_delta_w = config['max_delta_shape']
-    mask = bbox2mask(bboxes, height, width, max_delta_h, max_delta_w, config['outpaint'], bnd)
+    mask = bbox2mask(bboxes, height, width, max_delta_h, max_delta_w, bnd, config['outpaint'])
     if x.is_cuda:
         mask = mask.cuda()
-    result = x * (1. - mask)
+    (t,l,h,w) = bboxes[0,0]
+
+    if bnd is None:
+        result = x * (1. - mask)
+    else:
+        result = x[
+            :,:,
+            t - bnd:t + h + bnd,
+            l - bnd:l + w + bnd
+        ] * (1. - mask)
 
     return result, mask
 

@@ -56,9 +56,9 @@ def main():
     cp_path = Path(__file__).parent.resolve() / 'checkpoints' / config['dataset_name'] / exp_name
     if not cp_path.exists():
         cp_path.mkdir(parents=True)
-    elif config['resume'] is None:
-        print('Experiment has already been run! Terminating...')
-        exit()
+    # elif config['resume'] is None:
+    #     print('Experiment has already been run! Terminating...')
+    #     exit()
     shutil.copy(args.config, cp_path / PurePath(args.config).name)
     writer = SummaryWriter(cp_path)
     logger = get_logger(cp_path)
@@ -135,8 +135,14 @@ def main():
                 gt_bottom = ground_truth[:,:,:,:,2]
                 ground_truth = ground_truth[:,:,:,:,1]
             
-            bboxes = random_bbox(config)
-            x, mask = mask_image(ground_truth, bboxes, config, bnd=1)
+            bboxes = random_bbox(config, seed=0)
+            x, mask = mask_image(ground_truth, bboxes, config, bnd=config['boundary'])
+
+            (t,l,h,w) = bboxes[0,0]
+            ground_truth = ground_truth[:,:,t - config['boundary']:t + h + config['boundary'],l - config['boundary']:l + w + config['boundary']]
+            gt_top = gt_top[:,:,t - config['boundary']:t + h + config['boundary'],l - config['boundary']:l + w + config['boundary']]
+            gt_bottom = gt_bottom[:,:,t - config['boundary']:t + h + config['boundary'],l - config['boundary']:l + w + config['boundary']]
+
             if cuda: #in pytorch lightning this happens "in the backgorund", for pytorch you have to specify it (sends tensor to GPU)
                 x = x.cuda()
                 mask = mask.cuda()

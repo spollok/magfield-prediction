@@ -367,7 +367,8 @@ class LocalDis(nn.Module):
                 self.linear = nn.Linear(self.cnum * 4 * (patch_h // 16 + bal_x) * (patch_w // 16 + bal_y), 1)
             else:
                 # TODO Check adaptive number of channels
-                self.linear = nn.Linear(4096, 1)
+                # self.linear = nn.Linear(4096, 1)
+                self.linear = nn.Linear(9216, 1)
 
     def forward(self, x):
         x = self.dis_conv_module(x)
@@ -386,7 +387,8 @@ class GlobalDis(nn.Module):
         self.device_ids = device_ids
 
         self.dis_conv_module = DisConvModule(self.input_dim, self.cnum)
-        self.linear = nn.Linear(self.cnum*4 * image_shape[1] // 16 * image_shape[2] // 16, 1)
+        # self.linear = nn.Linear(self.cnum*4 * image_shape[1] // 16 * image_shape[2] // 16, 1)
+        self.linear = nn.Linear(9216, 1)
 
     def forward(self, x):
         x = self.dis_conv_module(x)
