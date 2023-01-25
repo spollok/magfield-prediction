@@ -153,21 +153,32 @@ def random_bbox(config, distributed=False, seed=None):
     return torch.tensor(bbox_list, dtype=torch.int64) # pylint: disable=E1102
 
 
-def bbox2mask(bboxes, height, width, max_delta_h, max_delta_w, outpaint=False):
+def bbox2mask(bboxes, height, width, max_delta_h, max_delta_w, bnd, outpaint=False):
     batch_size = bboxes.size(0)
-    if outpaint:
-        mask = torch.ones((batch_size, 1, height, width), dtype=torch.float32)
+    if bnd is not None:
+        mask_size = (batch_size, 1, bbox[2] + 2 * bnd, bbox[3] + 2 * bnd)
     else:
-        mask = torch.zeros((batch_size, 1, height, width), dtype=torch.float32)
+        mask_size = (batch_size, 1, height, width)
+
+    if outpaint:
+        mask = torch.ones(mask_size, dtype=torch.float32)
+    else:
+        mask = torch.zeros(mask_size, dtype=torch.float32)
 
     # Faster implementation for mask_batch_same is True
     for bbox in bboxes[0]:
         delta_h = np.random.randint(max_delta_h // 2 + 1)
         delta_w = np.random.randint(max_delta_w // 2 + 1)
+
+        init_t = bbox[0] + delta_h if bnd is None else bnd
+        init_l = bbox[1] + delta_w if bnd is None else bnd
+        end_t = max(bbox[0] + delta_h + 1, bbox[0] + bbox[2] - delta_h) if bnd is None else mask_size[2] - bnd
+        end_l = max(bbox[1] + delta_w + 1, bbox[1] + bbox[3] - delta_w) if bnd is None else mask_size[3] - bnd
+
         mask[
                 :,:,
-                bbox[0] + delta_h:max(bbox[0] + delta_h + 1, bbox[0] + bbox[2] - delta_h),
-                bbox[1] + delta_w:max(bbox[1] + delta_w + 1, bbox[1] + bbox[3] - delta_w)
+                init_t:end_t,
+                init_l:end_l
             ] = 0. if outpaint else 1.
 
     return mask
@@ -239,10 +250,10 @@ def local_patch(x, bboxes, s, outpaint, mode):
     return torch.stack(patches, dim=0).reshape(-1, x.shape[1], h_patch, w_patch)
 
 
-def mask_image(x, bboxes, config):
+def mask_image(x, bboxes, config, bnd=None):
     _, height, width = config['image_shape']
     max_delta_h, max_delta_w = config['max_delta_shape']
-    mask = bbox2mask(bboxes, height, width, max_delta_h, max_delta_w, config['outpaint'])
+    mask = bbox2mask(bboxes, height, width, max_delta_h, max_delta_w, config['outpaint'], bnd)
     if x.is_cuda:
         mask = mask.cuda()
     result = x * (1. - mask)

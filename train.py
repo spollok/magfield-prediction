@@ -18,6 +18,7 @@ from utils.logger import get_logger
 import matplotlib.pyplot as plt
 import matplotlib.colors as col
 
+#To be able to run from command prompt (changin parameters from config withour actually doing so=)
 parser = ArgumentParser()
 parser.add_argument(
     '--config', type=str,
@@ -135,8 +136,8 @@ def main():
                 ground_truth = ground_truth[:,:,:,:,1]
             
             bboxes = random_bbox(config)
-            x, mask = mask_image(ground_truth, bboxes, config)
-            if cuda:
+            x, mask = mask_image(ground_truth, bboxes, config, bnd=1)
+            if cuda: #in pytorch lightning this happens "in the backgorund", for pytorch you have to specify it (sends tensor to GPU)
                 x = x.cuda()
                 mask = mask.cuda()
                 ground_truth = ground_truth.cuda()
@@ -174,7 +175,7 @@ def main():
             trainer_module.optimizer_d.step()
             trainer_module.scheduler.step()
 
-            # Log and visualization
+            # Log and visualization - log and update to see (change it a bit to do with WandB)
             log_losses = ['l1', 'ae', 'wgan_g', 'wgan_d', 'wgan_gp', 'g', 'd']
             if config['div_loss']: log_losses.extend(['div'])
             if config['curl_loss']: log_losses.extend(['curl'])
@@ -240,7 +241,7 @@ def main():
                         # Extract center layer if three layers are provided
                         if len(ground_truth.shape) == 5:
                             ground_truth = ground_truth[:,:,:,:,1]
-                        bboxes = random_bbox(config)
+                        bboxes = random_bbox(config) # ADD SEED!!
                         x, mask = mask_image(ground_truth, bboxes, config)
 
                         if cuda:
