@@ -152,9 +152,10 @@ def random_bbox(config, distributed=False, seed=None):
 
     return torch.tensor(bbox_list, dtype=torch.int64) # pylint: disable=E1102
 
-
+#bboxes is the output from random_bbox (torch.tensor)
 def bbox2mask(bboxes, height, width, max_delta_h, max_delta_w, bnd, outpaint=False):
     batch_size = bboxes.size(0)
+    #Adding boundary condition
     if bnd is not None:
         mask_size = (batch_size, 1, int(bboxes[0,0][2] + 2 * bnd), int(bboxes[0,0][3] + 2 * bnd))
     else:
