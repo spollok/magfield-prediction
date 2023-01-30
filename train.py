@@ -51,7 +51,7 @@ def main():
         mode += '_curl'
     exp_name = mode + '_' + str(config['box_amount']) + '_' \
         + str(config['mask_shape'][0]) + '_' + str(config['scale_factor'])
-    if config['test']: #hola
+    if config['test']: 
         exp_name = 'test_' + exp_name
     cp_path = Path(__file__).parent.resolve() / 'checkpoints' / config['dataset_name'] / exp_name
     if not cp_path.exists():
