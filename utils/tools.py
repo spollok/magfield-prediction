@@ -108,7 +108,7 @@ def extract_image_patches(images, ksizes, strides, rates, padding='same'):
     return patches  # [N, C*k*k, L], L is the total number of such blocks
 
 
-def random_bbox(config, distributed=False, seed=None):
+def random_bbox(config, distributed=False, rng=None):
     """Generate a random tlhw with configuration.
 
     Args:
@@ -120,7 +120,7 @@ def random_bbox(config, distributed=False, seed=None):
         List of tuples for each sample in batch
 
     """
-    rng = np.random.default_rng(seed)
+    if rng is None: rng = np.random.default_rng()
     _, img_height, img_width = config['image_shape']
     h, w = config['mask_shape']
     margin_height, margin_width = config['margin']

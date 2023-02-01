@@ -2,6 +2,7 @@ import os
 import random
 import time
 import shutil
+import numpy as np
 from pathlib import PurePath, Path
 from argparse import ArgumentParser
 
@@ -131,6 +132,7 @@ def main():
         iterable_val_loader = iter(val_loader)
         l1_loss = nn.L1Loss()
         
+        rng = np.random.default_rng(0)
         time_count = time.time()
         
         for iteration in range(start_iteration, config['niter'] + 1):
@@ -148,7 +150,7 @@ def main():
                 gt_bottom = ground_truth[:,:,:,:,2]
                 ground_truth = ground_truth[:,:,:,:,1]
             
-            bboxes = random_bbox(config, seed=0)
+            bboxes = random_bbox(config, rng=rng)
             x, mask = mask_image(ground_truth, bboxes, config, bnd=config['boundary'])
 
             (t,l,h,w) = bboxes[0,0]
@@ -283,8 +285,8 @@ def main():
                             x2_eval = x2 * mask + x * (1. - mask)
                         val_loss.append(l1_loss(x2_eval, ground_truth))
 
-                    wandb.log({"L1-loss (val)": val_loss})
                     val_err = sum(val_loss) / len(val_loss)
+                    wandb.log({"L1-loss (val)": val_err})
 
                     # Saving best model
                     if val_err < best_score:
