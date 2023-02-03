@@ -1,5 +1,5 @@
 # data parameters
-dataset_name: boundary_256
+dataset_name: boundary_256_large
 train_data: paper_256
 val_data: paper_256
 test: False
