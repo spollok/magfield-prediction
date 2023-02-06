@@ -1,7 +1,7 @@
 # data parameters
-dataset_name: magfield_256_large.h5
-train_data: bnd_256
-val_data: bnd_256
+dataset_name: boundary_1_256
+train_data: bnd_256/magfield_256_large.h5
+val_data: bnd_256/magfield_256_large.h5
 test: False
 resume:
 batch_size: 2
