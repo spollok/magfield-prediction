@@ -1,7 +1,7 @@
 # data parameters
-dataset_name: boundary_256
-train_data: paper_256
-val_data: paper_256
+dataset_name: magfield_256_large.h5
+train_data: bnd_256
+val_data: bnd_256
 test: False
 resume:
 batch_size: 2
@@ -30,7 +30,7 @@ beta1: 0.5
 beta2: 0.9
 n_critic: 10
 niter: 10000
-print_iter: 10
+print_iter: None
 viz_iter: 5
 snapshot_save_iter: 10000
 valid_iter: 2500

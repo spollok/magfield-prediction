@@ -1,6 +1,7 @@
 import os
 import numpy as np
 import torch
+import h5py
 
 
 class Dataset(torch.utils.data.Dataset):
@@ -15,7 +16,10 @@ class Dataset(torch.utils.data.Dataset):
 
     def __getitem__(self, index):
         path = os.path.join(self.data_path, self.samples[index])
-        img = np.load(path)
+        #img = np.load(path)
+        imgh5 = h5py.File(path)
+        img = imgh5['field'][index]
+        #img = img[index]
         if self.image_shape is not None:
             img = img[:, :self.image_shape[1], :self.image_shape[2]]
         if self.aux:

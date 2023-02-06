@@ -216,7 +216,7 @@ class Trainer(nn.Module):
         except:
             iteration = 1
 
-        print("Resume from {} at iteration {}".format(checkpoint_dir, iteration))
+        #("Resume from {} at iteration {}".format(checkpoint_dir, iteration))
         logger.info("Resume from {} at iteration {}".format(checkpoint_dir, iteration))
 
         return iteration
