@@ -29,10 +29,10 @@ lr: 0.0001
 beta1: 0.5
 beta2: 0.9
 n_critic: 10
-niter: 10000
-print_iter: 20
-viz_iter: 5
-snapshot_save_iter: 10000
+niter: 300000
+print_iter: 5000
+viz_iter: 5000
+snapshot_save_iter: 20000
 valid_iter: 2500
 
 # loss weight

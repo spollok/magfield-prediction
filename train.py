@@ -12,7 +12,7 @@ import torch.backends.cudnn as cudnn
 from torch.utils.tensorboard import SummaryWriter
 
 from trainer import Trainer
-from utils.dataset import Dataset
+from utils.dataset import MagneticFieldDataset
 from utils.tools import get_config, random_bbox, mask_image
 from utils.logger import get_logger
 
@@ -86,7 +86,7 @@ def main():
     try:  # for unexpected error logging
         datapath = Path(__file__).parent.resolve() / 'data'
         logger.info(f"Training on dataset: {config['dataset_name']}")
-        train_dataset = Dataset(
+        train_dataset = MagneticFieldDataset(
             datapath / config['train_data'],
             config['scale_factor'],
             image_shape=config['image_shape']
@@ -99,7 +99,7 @@ def main():
             num_workers=config['num_workers'],
             drop_last=True
         )
-        val_dataset = Dataset(
+        val_dataset = MagneticFieldDataset(
             datapath / config['val_data'],
             scaling=config['scale_factor'],
             image_shape=config['image_shape']
