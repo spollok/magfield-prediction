@@ -4,7 +4,7 @@ train_data: bnd_256/magfield_256_large.h5
 val_data: bnd_256/magfield_256_large.h5
 test: False
 resume:
-batch_size: 2
+batch_size: 100
 image_shape: [3, 256, 256]
 mask_shape: [94, 94]
 mask_batch_same: True
@@ -30,7 +30,7 @@ beta1: 0.5
 beta2: 0.9
 n_critic: 10
 niter: 10000
-print_iter: None
+print_iter: 20
 viz_iter: 5
 snapshot_save_iter: 10000
 valid_iter: 2500

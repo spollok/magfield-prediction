@@ -91,7 +91,7 @@ def main():
             config['scale_factor'],
             image_shape=config['image_shape']
         )
-        print('hola: '+str(len(train_dataset)))
+        
         train_loader = torch.utils.data.DataLoader(
             dataset=train_dataset,
             batch_size=config['batch_size'],
@@ -130,7 +130,6 @@ def main():
         else:
             start_iteration = 1
         iterable_train_loader = iter(train_loader)
-        print(len(train_loader))
         iterable_val_loader = iter(val_loader)
         l1_loss = nn.L1Loss()
         
@@ -138,7 +137,6 @@ def main():
         time_count = time.time()
         
         for iteration in range(start_iteration, config['niter'] + 1):
-            print('hola')
             try:
                 ground_truth = next(iterable_train_loader)
             except StopIteration:
