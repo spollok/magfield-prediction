@@ -20,7 +20,7 @@ class Generator(nn.Module):
 
     def forward(self, x, mask):
         x_stage1 = self.coarse_generator(x, mask) if self.coarse_G else None
-        x_stage2 = self.fine_generator(x, mask)
+        x_stage2 = self.fine_generator(x, x_stage1, mask)
 
         return x_stage1, x_stage2
 
@@ -124,7 +124,7 @@ class FineGenerator(nn.Module):
             ones = ones.cuda()
             mask = mask.cuda()
 
-        if x_stage1 is None:
+        if x_stage1 is not None:
             x1_inpaint = x_stage1 * mask + xin * (1. - mask)
             # conv branch
             xnow = torch.cat([x1_inpaint, ones, mask], dim=1)

@@ -4,7 +4,7 @@ train_data: bnd_256/magfield_256_large.h5
 val_data: bnd_256/magfield_256_large.h5
 test: False
 resume:
-batch_size: 100
+batch_size: 250
 image_shape: [3, 256, 256]
 mask_shape: [94, 94]
 mask_batch_same: True
@@ -13,7 +13,7 @@ margin: [4, 4]
 div_loss: True
 curl_loss: True
 coarse_G: False
-wandb: False
+wandb: True
 
 # Costum parameter for magnetic field prediction
 boundary: 1
@@ -30,7 +30,7 @@ num_workers: 16
 lr: 0.0001
 beta1: 0.5
 beta2: 0.9
-n_critic: 10
+n_critic: 5
 niter: 300000
 print_iter: 5000
 viz_iter: 5000

@@ -5,7 +5,7 @@ import torch.optim as optim
 from torch import autograd
 
 from model.networks import Generator, GlobalDis
-from utils.tools import get_model_list, local_patch, patch_mask
+from utils.tools import get_model_list
 from utils.logger import get_logger
 
 logger = get_logger()
@@ -60,15 +60,12 @@ class Trainer(nn.Module):
         losses = {}
 
         x1, x2 = self.netG(x, mask)
-        lp_gt = local_patch(gt, bboxes, self.box_patch, self.outpaint, self.mode)
         if self.outpaint:
-            x1_eval = x1
+            if x1 is not None: x1_eval = x1
             x2_eval = x2
         else:
-            x1_eval = x1 * mask + x * (1. - mask)
+            if x1 is not None: x1_eval = x1 * mask + x * (1. - mask)
             x2_eval = x2 * mask + x * (1. - mask)
-        lp_x1_inpaint = local_patch(x1_eval, bboxes, self.box_patch, self.outpaint, self.mode)
-        lp_x2_inpaint = local_patch(x2_eval, bboxes, self.box_patch, self.outpaint, self.mode)
         
         # D part
         # wgan d loss
@@ -80,12 +77,11 @@ class Trainer(nn.Module):
 
         # G part
         if compute_loss_g:
-            p_mask = patch_mask(self.config)
-            losses['l1'] = l1_loss(lp_x1_inpaint * p_mask, lp_gt * p_mask) \
-                * self.config['coarse_l1_alpha'] + l1_loss(lp_x2_inpaint * p_mask, lp_gt * p_mask)
-            
-            losses['ae'] = l1_loss(x1 * (1. - mask), gt * (1. - mask)) \
-                * self.config['coarse_l1_alpha'] + l1_loss(x2 * (1. - mask), gt * (1. - mask))
+            losses['l1'] = l1_loss(x2_eval, gt)
+            losses['ae'] = l1_loss(x2 * (1. - mask), gt * (1. - mask))
+            if x1 is not None:
+                losses['l1'] += l1_loss(x1_eval, gt) * self.config['coarse_l1_alpha']
+                losses['ae'] += l1_loss(x1 * (1. - mask), gt * (1. - mask)) * self.config['coarse_l1_alpha']
 
             # Shape: bs x comp x res_h (y) x res_w (x) x z
             if self.config['netG']['input_dim'] == 3:
