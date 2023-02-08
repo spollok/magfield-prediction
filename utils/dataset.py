@@ -5,11 +5,10 @@ import h5py
 
 
 class MagneticFieldDataset(torch.utils.data.Dataset):
-    def __init__(self, datapath, scaling, image_shape=None):
+    def __init__(self, datapath, scaling):
         super(MagneticFieldDataset, self).__init__()
         self.db_path = datapath
         self.scaling = scaling
-        self.image_shape = image_shape
         self.size = h5py.File(self.db_path, mode='r')['field'].shape[0]
  
     def open_hdf5(self):
@@ -19,15 +18,7 @@ class MagneticFieldDataset(torch.utils.data.Dataset):
         if not hasattr(self, 'db'):
             self.open_hdf5()
 
-        field = self.db['field'][idx]
-
-        if self.image_shape is not None:
-            field = field[:, :self.image_shape[1], :self.image_shape[2]]
-
-        field = torch.from_numpy(field.astype('float32'))
-        field_scaled = field * self.scaling
-
-        return field_scaled
+        return torch.from_numpy(self.db['field'][idx].astype('float32')) * self.scaling
 
     def __len__(self):
         return self.size

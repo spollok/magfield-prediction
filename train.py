@@ -85,10 +85,10 @@ def main():
     try:  # for unexpected error logging
         datapath = Path(__file__).parent.resolve() / 'data'
         logger.info(f"Training on dataset: {config['dataset_name']}")
+
         train_dataset = MagneticFieldDataset(
             datapath / config['train_data'],
-            config['scale_factor'],
-            image_shape=config['image_shape']
+            config['scale_factor']
         )
         
         train_loader = torch.utils.data.DataLoader(
@@ -98,11 +98,12 @@ def main():
             num_workers=config['num_workers'],
             drop_last=True
         )
+
         val_dataset = MagneticFieldDataset(
             datapath / config['val_data'],
-            scaling=config['scale_factor'],
-            image_shape=config['image_shape']
+            scaling=config['scale_factor']
         )
+        
         val_loader = torch.utils.data.DataLoader(
             dataset=val_dataset,
             batch_size=config['batch_size'],
