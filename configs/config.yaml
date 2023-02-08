@@ -12,6 +12,7 @@ max_delta_shape: [16,16]
 margin: [4, 4]
 div_loss: True
 curl_loss: True
+coarse_G: False
 
 # Costum parameter for magnetic field prediction
 boundary: 1

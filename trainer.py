@@ -20,9 +20,11 @@ class Trainer(nn.Module):
         self.box_patch = self.config['box_patch']
         self.outpaint = self.config['outpaint']
         self.mode = self.config['mode']
+        self.coarse_G = self.config['coarse_G']
 
         self.netG = Generator(
             self.config['netG'],
+            self.config['coarse_G'],
             self.use_cuda,
             self.device_ids
         )
