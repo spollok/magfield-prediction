@@ -9,7 +9,6 @@ from argparse import ArgumentParser
 import torch
 import torch.nn as nn
 import torch.backends.cudnn as cudnn
-from torch.utils.tensorboard import SummaryWriter
 
 from trainer import Trainer
 from utils.dataset import MagneticFieldDataset
@@ -36,11 +35,12 @@ def main():
     config = get_config(args.config)
 
     #To work with WandB
-    run = wandb.init(
-        project="wgan-gp_bnd1", 
-        entity="andreathesis",
-        config=config
-    )
+    if config['wandb']:
+        run = wandb.init(
+            project="wgan-gp_bnd1", 
+            entity="andreathesis",
+            config=config
+        )
 
     # CUDA configuration
     cuda = config['cuda']
@@ -70,7 +70,6 @@ def main():
     #     print('Experiment has already been run! Terminating...')
     #     exit()
     shutil.copy(args.config, cp_path / PurePath(args.config).name)
-    writer = SummaryWriter(cp_path)
     logger = get_logger(cp_path)
     best_score = 1
 
@@ -113,11 +112,10 @@ def main():
         )
         trainer = Trainer(config)
         logger.info("\n{}".format(trainer.netG))
-        logger.info("\n{}".format(trainer.localD))
         logger.info("\n{}".format(trainer.globalD))
         
-        #WandB
-        wandb.watch(trainer, log_freq=1, log='all')
+        # WandB
+        # wandb.watch(trainer, log_freq=1, log='all')
 
         if cuda:
             trainer = nn.parallel.DataParallel(trainer, device_ids=device_ids)
@@ -182,7 +180,6 @@ def main():
             trainer_module.optimizer_d.zero_grad()
             losses['d'] = losses['wgan_d'] + losses['wgan_gp'] * config['wgan_gp_lambda']
             losses['d'].backward()
-            wandb.log({"losses D": losses['d']})
 
             # Update G
             if compute_g_loss:
@@ -193,7 +190,6 @@ def main():
                 if config['div_loss']: losses['g'] += losses['div'] * config['div_loss_alpha']
                 if config['curl_loss']: losses['g'] += losses['curl'] * config['curl_loss_alpha']
                 losses['g'].backward()
-                wandb.log({"losses G": losses['g']})
                 trainer_module.optimizer_g.step()
 
             trainer_module.optimizer_d.step()
@@ -205,8 +201,6 @@ def main():
             if config['div_loss']: log_losses.extend(['div'])
             if config['curl_loss']: log_losses.extend(['curl'])
 
-            #wandb.log({"Log losses": log_losses})
-
             if iteration % config['print_iter'] == 0:
                 time_count = time.time() - time_count
                 speed = config['print_iter'] / time_count
@@ -216,8 +210,7 @@ def main():
                 message = 'Iter: [%d/%d] ' % (iteration, config['niter'])
                 for k in log_losses:
                     v = losses.get(k, 0.)
-                    wandb.log({str(k): v})
-                    writer.add_scalar(k, v, iteration)
+                    if config['wandb']: wandb.log({str(k): v})
                     message += '%s: %.6f ' % (k, v)
                 message += speed_msg
                 logger.info(message)
@@ -287,7 +280,7 @@ def main():
                         val_loss.append(l1_loss(x2_eval, ground_truth))
 
                     val_err = sum(val_loss) / len(val_loss)
-                    wandb.log({"L1-loss (val)": val_err})
+                    if config['wandb']: wandb.log({"L1-loss (val)": val_err})
 
                     # Saving best model
                     if val_err < best_score:
@@ -295,7 +288,6 @@ def main():
                         best_score = val_err
                         trainer_module.save_model(cp_path, iteration, best=True)
 
-                    writer.add_scalar('val_l1', val_err, iteration)
                     logger.info(f'Validation: {val_err:.6f}')
 
     except Exception as e:  # for unexpected error logging
