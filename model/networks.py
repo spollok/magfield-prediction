@@ -108,21 +108,7 @@ class FineGenerator(nn.Module):
         self.conv9_atrous = gen_conv(cnum*4, cnum*4, 3, 1, 8, rate=8)
         self.conv10_atrous = gen_conv(cnum*4, cnum*4, 3, 1, 16, rate=16)
 
-        # attention branch
-        # 3 x 256 x 256
-        self.pmconv1 = gen_conv(input_dim + 2, cnum, 5, 1, 2)
-        self.pmconv2_downsample = gen_conv(cnum, cnum, 3, 2, 1)
-        # cnum*2 x 128 x 128
-        self.pmconv3 = gen_conv(cnum, cnum*2, 3, 1, 1)
-        self.pmconv4_downsample = gen_conv(cnum*2, cnum*4, 3, 2, 1)
-        # cnum*4 x 64 x 64
-        self.pmconv5 = gen_conv(cnum*4, cnum*4, 3, 1, 1)
-        self.pmconv6 = gen_conv(cnum*4, cnum*4, 3, 1, 1, activation='relu')
-        self.contextul_attention = ContextualAttention(ksize=3, stride=1, rate=2, fuse_k=3, softmax_scale=10,
-                                                       fuse=True, use_cuda=self.use_cuda, device_ids=self.device_ids)
-        self.pmconv9 = gen_conv(cnum*4, cnum*4, 3, 1, 1)
-        self.pmconv10 = gen_conv(cnum*4, cnum*4, 3, 1, 1)
-        self.allconv11 = gen_conv(cnum*8, cnum*4, 3, 1, 1)
+        self.allconv11 = gen_conv(cnum*4, cnum*4, 3, 1, 1)
         self.allconv12 = gen_conv(cnum*4, cnum*4, 3, 1, 1)
         self.allconv13 = gen_conv(cnum*4, cnum*2, 3, 1, 1)
         self.allconv14 = gen_conv(cnum*2, cnum*2, 3, 1, 1)
@@ -149,20 +135,6 @@ class FineGenerator(nn.Module):
         x = self.conv8_atrous(x)
         x = self.conv9_atrous(x)
         x = self.conv10_atrous(x)
-        x_hallu = x
-        # attention branch
-        x = self.pmconv1(xnow)
-        x = self.pmconv2_downsample(x)
-        x = self.pmconv3(x)
-        x = self.pmconv4_downsample(x)
-        x = self.pmconv5(x)
-        x = self.pmconv6(x)
-        x = self.contextul_attention(x, x, mask)
-        x = self.pmconv9(x)
-        x = self.pmconv10(x)
-        pm = x
-        x = torch.cat([x_hallu, pm], dim=1)
-        # merge two branches
         x = self.allconv11(x)
         x = self.allconv12(x)
         x = F.interpolate(x, scale_factor=2, mode='nearest', recompute_scale_factor=True)
