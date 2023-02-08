@@ -379,7 +379,7 @@ class LocalDis(nn.Module):
 
 
 class GlobalDis(nn.Module):
-    def __init__(self, config, image_shape, use_cuda=True, device_ids=None):
+    def __init__(self, config, image_shape, mask_shape, bnd, use_cuda=True, device_ids=None):
         super(GlobalDis, self).__init__()
         self.input_dim = image_shape[0]
         self.cnum = config['ndf']
@@ -387,8 +387,7 @@ class GlobalDis(nn.Module):
         self.device_ids = device_ids
 
         self.dis_conv_module = DisConvModule(self.input_dim, self.cnum)
-        # self.linear = nn.Linear(self.cnum*4 * image_shape[1] // 16 * image_shape[2] // 16, 1)
-        self.linear = nn.Linear(9216, 1)
+        self.linear = nn.Linear(self.cnum*4 * (mask_shape[0] + 2*bnd) // 16 * (mask_shape[1] + 2*bnd) // 16, 1)
 
     def forward(self, x):
         x = self.dis_conv_module(x)

@@ -4,7 +4,7 @@ import torch.nn as nn
 import torch.optim as optim
 from torch import autograd
 
-from model.networks import Generator, LocalDis, GlobalDis
+from model.networks import Generator, GlobalDis
 from utils.tools import get_model_list, local_patch, patch_mask
 from utils.logger import get_logger
 
@@ -26,19 +26,11 @@ class Trainer(nn.Module):
             self.use_cuda,
             self.device_ids
         )
-        self.localD = LocalDis(
-            self.config['netD'],
-            self.config['mask_shape'],
-            self.config['image_shape'],
-            self.outpaint,
-            self.box_patch,
-            self.mode,
-            self.use_cuda,
-            self.device_ids
-        )
         self.globalD = GlobalDis(
             self.config['netD'],
             self.config['image_shape'],
+            self.config['mask_shape'],
+            self.config['boundary'],
             self.use_cuda,
             self.device_ids
         )
@@ -49,7 +41,7 @@ class Trainer(nn.Module):
             betas=(self.config['beta1'], self.config['beta2'])
         )
         self.optimizer_d = torch.optim.Adam(
-            list(self.localD.parameters()) + list(self.globalD.parameters()),
+            list(self.globalD.parameters()),
             lr=config['lr'],
             betas=(self.config['beta1'], self.config['beta2'])
         )
@@ -58,7 +50,6 @@ class Trainer(nn.Module):
 
         if self.use_cuda:
             self.netG.to(self.device_ids[0])
-            self.localD.to(self.device_ids[0])
             self.globalD.to(self.device_ids[0])
 
     def forward(self, x, bboxes, mask, gt, gt_top, gt_bottom, compute_loss_g=False):
@@ -79,14 +70,11 @@ class Trainer(nn.Module):
         
         # D part
         # wgan d loss
-        lp_real_pred, lp_fake_pred = self.dis_forward(self.localD, lp_gt, lp_x2_inpaint.detach())
         global_real_pred, global_fake_pred = self.dis_forward(self.globalD, gt, x2_eval.detach())
-        losses['wgan_d'] = torch.mean(lp_fake_pred - lp_real_pred) + \
-            torch.mean(global_fake_pred - global_real_pred) * self.config['global_wgan_loss_alpha']
+        losses['wgan_d'] = torch.mean(global_fake_pred - global_real_pred) * self.config['global_wgan_loss_alpha']
         # gradients penalty loss
-        local_penalty = self.calc_gradient_penalty(self.localD, lp_gt, lp_x2_inpaint.detach())
         global_penalty = self.calc_gradient_penalty(self.globalD, gt, x2_eval.detach())
-        losses['wgan_gp'] = local_penalty + global_penalty
+        losses['wgan_gp'] = global_penalty
 
         # G part
         if compute_loss_g:
@@ -132,10 +120,8 @@ class Trainer(nn.Module):
                 losses['curl'] = torch.mean(curl_mag)
             
             # wgan g loss
-            lp_real_pred, lp_fake_pred = self.dis_forward(self.localD, lp_gt, lp_x2_inpaint)
             global_real_pred, global_fake_pred = self.dis_forward(self.globalD, gt, x2_eval)
-            losses['wgan_g'] = - torch.mean(lp_fake_pred) - \
-                torch.mean(global_fake_pred) * self.config['global_wgan_loss_alpha']
+            losses['wgan_g'] = -torch.mean(global_fake_pred) * self.config['global_wgan_loss_alpha']
 
         return losses, x2_eval, x2
 
@@ -189,8 +175,7 @@ class Trainer(nn.Module):
             gen_name = os.path.join(checkpoint_dir, 'gen_%08d.pt' % iteration)
             dis_name = os.path.join(checkpoint_dir, 'dis_%08d.pt' % iteration)
             opt_name = os.path.join(checkpoint_dir, 'optimizer.pt')
-            torch.save({'localD': self.localD.state_dict(),
-                        'globalD': self.globalD.state_dict()}, dis_name)
+            torch.save({'globalD': self.globalD.state_dict()}, dis_name)
             torch.save({'gen': self.optimizer_g.state_dict(),
                         'dis': self.optimizer_d.state_dict()}, opt_name)
 
@@ -207,7 +192,6 @@ class Trainer(nn.Module):
                 # Load discriminators
                 last_model_name = get_model_list(checkpoint_dir, "dis", iteration=iteration)
                 state_dict = torch.load(last_model_name)
-                self.localD.load_state_dict(state_dict['localD'])
                 self.globalD.load_state_dict(state_dict['globalD'])
                 # Load optimizers
                 state_dict = torch.load(os.path.join(checkpoint_dir, 'optimizer.pt'))
