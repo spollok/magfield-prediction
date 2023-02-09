@@ -1,5 +1,7 @@
 ### Project ###
+nohup.out
 wandb/
+
 # Visual Studio Code configurations
 .vscode/
 

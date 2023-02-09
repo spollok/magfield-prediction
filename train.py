@@ -196,12 +196,6 @@ def main():
             trainer_module.optimizer_d.step()
             trainer_module.scheduler.step()
 
-            # Log and visualization - log and update to see (change it a bit to do with WandB)
-            log_losses = ['l1', 'ae', 'wgan_g', 'wgan_d', 'wgan_gp', 'g', 'd']
-            
-            if config['div_loss']: log_losses.extend(['div'])
-            if config['curl_loss']: log_losses.extend(['curl'])
-
             if iteration % config['print_iter'] == 0:
                 time_count = time.time() - time_count
                 speed = config['print_iter'] / time_count
@@ -209,12 +203,12 @@ def main():
                 time_count = time.time()
 
                 message = 'Iter: [%d/%d] ' % (iteration, config['niter'])
-                for k in log_losses:
-                    v = losses.get(k, 0.)
-                    if config['wandb']: wandb.log({str(k): v})
+                for k, v in losses.items():
                     message += '%s: %.6f ' % (k, v)
                 message += speed_msg
                 logger.info(message)
+                
+                if config['wandb']: wandb.log(data=losses, step=iteration)
             
             if iteration % (config['viz_iter']) == 0:
                 gt = ground_truth / config['scale_factor']
