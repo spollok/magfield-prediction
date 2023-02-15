@@ -1,7 +1,7 @@
 # data parameters
 dataset_name: boundary_1_256
 train_data: bnd_256/magfield_256_large.h5
-val_data: bnd_256/magfield_256_large.h5
+val_data: magfield_val_256.h5
 test: False
 resume:
 batch_size: 150
@@ -39,7 +39,7 @@ valid_iter: 2500
 
 # loss weight
 coarse_l1_alpha: 1.2
-l1_loss_alpha: 3.6
+l1_loss_alpha: 0 #3.6
 ae_loss_alpha: 7.2
 global_wgan_loss_alpha: 1.
 gan_loss_alpha: 0.001

@@ -12,8 +12,8 @@ import ray
 from ray.actor import ActorHandle
 from tqdm import tqdm
 
-from magtense import magtense
-
+#from magtense import magtense
+import magtense
 
 def generate_exp(idx, res, datapath, t_start, check, ext,
                  test, lab_setup, orig, shared=False, pba=None):
