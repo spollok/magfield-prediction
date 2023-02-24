@@ -116,7 +116,7 @@ def predict(
                 gt = torch.from_numpy(gt[:,:,:,:,1].astype('float32'))
 
             bboxes = random_bbox(config, distributed=mask_distributed, seed=i)
-            x, mask = mask_image(gt, bboxes, config)
+            x, mask, _ = mask_image(gt, bboxes, config)
 
             # Prediction of missing field data with different methods
             if method == 'wgan':

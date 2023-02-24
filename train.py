@@ -59,11 +59,11 @@ def main():
         mode += '_div'
     if config['curl_loss']:
         mode += '_curl'
-    exp_name = mode + '_' + str(config['box_amount']) + '_' \
-        + str(config['mask_shape'][0]) + '_' + str(config['scale_factor'])
+    #exp_name = mode + '_' + str(config['box_amount']) + '_' \
+    #''''   + str(config['mask_shape'][0]) + '_' + str(config['scale_factor'])
     if config['test']: 
-        exp_name = 'test_' + exp_name
-    cp_path = Path(__file__).parent.resolve() / 'checkpoints' / config['dataset_name'] / exp_name
+        exp_name = 'test_' + config['exp_name']
+    cp_path = Path(__file__).parent.resolve() / 'checkpoints' / config['dataset_name'] / config['exp_name']
     if not cp_path.exists():
         cp_path.mkdir(parents=True)
     # elif config['resume'] is None:
@@ -151,7 +151,7 @@ def main():
                 ground_truth = ground_truth[:,:,:,:,1]
             
             bboxes = random_bbox(config, rng=rng)
-            x, mask = mask_image(ground_truth, bboxes, config, bnd=config['boundary'])
+            x, mask, _ = mask_image(ground_truth, bboxes, config, bnd=config['boundary'])
 
             (t,l,h,w) = bboxes[0,0]
             ground_truth = ground_truth[:,:,t - config['boundary']:t + h + config['boundary'],l - config['boundary']:l + w + config['boundary']]
@@ -259,7 +259,7 @@ def main():
                         if len(ground_truth.shape) == 5:
                             ground_truth = ground_truth[:,:,:,:,1]
                         bboxes = random_bbox(config) # ADD SEED!!
-                        x, mask = mask_image(ground_truth, bboxes, config)
+                        x, mask, _ = mask_image(ground_truth, bboxes, config)
 
                         if cuda:
                             x = x.cuda()

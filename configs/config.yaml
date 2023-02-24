@@ -12,8 +12,9 @@ max_delta_shape: [16,16]
 margin: [4, 4]
 div_loss: True
 curl_loss: True
-coarse_G: False
+coarse_G: True
 wandb: True
+exp_name: '_with_coarse_and_l1'
 
 # Costum parameter for magnetic field prediction
 boundary: 1
@@ -31,7 +32,7 @@ lr: 0.0001
 beta1: 0.5
 beta2: 0.9
 n_critic: 5
-niter: 100000
+niter: 500000
 print_iter: 5000
 viz_iter: 5000
 snapshot_save_iter: 20000
