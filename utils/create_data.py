@@ -249,7 +249,8 @@ def sample_check(field, v_max=1, filename=f'foo_{datetime.utcnow().strftime("%y%
     plt.clf()
     labels = ['Bx-field', 'By-field', 'Bz-field']
     nrows = 3 if cube else 1
-    fig, axes = plt.subplots(nrows=nrows, ncols=3, sharex=True, sharey=True, figsize=(15,10))
+    fig, axes = plt.subplots(nrows=nrows, ncols=3, sharex=True, sharey=True, figsize=(15,5))
+    fig.suptitle(filename)
 
     if cube:
         for i, z in enumerate([0, 1, 2]):
