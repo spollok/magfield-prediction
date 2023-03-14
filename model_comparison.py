@@ -115,21 +115,21 @@ for i in models:
     
     psnr_mat = psnr_mat[~np.isnan(psnr_mat)]
     
-    err_mat[0,models.index(i)+1] = np.average(mse_mat)
+    err_mat[0,models.index(i)+1] = np.average(mse_mat)*1e3
     err_mat[1,models.index(i)+1] = np.average(psnr_mat)
     err_mat[2,models.index(i)+1] = np.average(mape_mat)
-    err_mat[3,models.index(i)+1] = np.average(div_mat)
-    err_mat[4,models.index(i)+1] = np.average(curl_mat)
+    err_mat[3,models.index(i)+1] = np.average(div_mat)*1e3
+    err_mat[4,models.index(i)+1] = np.average(curl_mat)*1e6
 
 #%%
 err_list = err_mat.tolist()
 
-err_list[0][0] = 'MSE'
-err_list[1][0] = 'PSNR'
-err_list[2][0] = 'MAPE'
-err_list[3][0] = 'Div'
-err_list[4][0] = 'Curl'
-print(tabulate(err_list, headers=['Test']+models, tablefmt="grid", showindex="always"))
+err_list[0][0] = 'MSE [mT]'
+err_list[1][0] = 'PSNR [dB]'
+err_list[2][0] = 'MAPE [%]'
+err_list[3][0] = 'Div [mT/px]'
+err_list[4][0] = 'Curl [\u03BC T/px]'
+print(tabulate(err_list, headers=['Test']+models, tablefmt="grid", showindex=False))
 
 
 # %%
