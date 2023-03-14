@@ -17,12 +17,12 @@ plt_scale = 0.1
 rng = np.random.default_rng(0)
 path_orig = r'C:/Users/s174370/Desktop/magfield-prediction/checkpoints/boundary_1_256/'
 
-models = ['in_94_coarseG_l1', 'in_94_l1', 'in_94_lightweight']
+models = ['in_94_coarseG_l1', 'in_94_coarseG_l1False', 'in_94_l1', 'in_94_lightweight']
 # model = 'in_div_curl_1_94_1' #does not work with this script
 file = h5py.File('data/bnd_256/magfield_256_large.h5') 
 
-# Empty matrix so append errors (3 models, 5 performance tests: mse, psnr, mape, divergence, curl)
-err_mat = np.empty([5,4])
+# Empty matrix so append errors (4 models, 5 performance tests: mse, psnr, mape, divergence, curl)
+err_mat = np.empty([5,5])
 # %%
 for i in models:
     model = i
