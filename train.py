@@ -52,23 +52,13 @@ def main():
         cudnn.benchmark = True
 
     # Configure checkpoint path
-    mode = f"out_{config['mode']}" if config['outpaint'] else 'in'
-    if config['mode'] == 'extend':
-        mode += '_ext'
-    if config['div_loss']:
-        mode += '_div'
-    if config['curl_loss']:
-        mode += '_curl'
-    #exp_name = mode + '_' + str(config['box_amount']) + '_' \
-    #''''   + str(config['mask_shape'][0]) + '_' + str(config['scale_factor'])
-    if config['test']: 
-        exp_name = 'test_' + config['exp_name']
-    cp_path = Path(__file__).parent.resolve() / 'checkpoints' / config['dataset_name'] / config['exp_name']
+    exp_name = 'test_' + config['exp_name'] if config['test'] else config['exp_name']
+    cp_path = Path(__file__).parent.resolve() / 'checkpoints' / config['dataset_name'] / exp_name
     if not cp_path.exists():
         cp_path.mkdir(parents=True)
-    # elif config['resume'] is None:
-    #     print('Experiment has already been run! Terminating...')
-    #     exit()
+    elif config['resume'] is None:
+        print('Experiment has already been run! Terminating...')
+        exit()
     shutil.copy(args.config, cp_path / PurePath(args.config).name)
     logger = get_logger(cp_path)
     best_score = 1
