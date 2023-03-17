@@ -8,7 +8,6 @@ import torch
 import torch.nn as nn
 import h5py
 
-from utils.create_data import sample_check
 from utils.tools import random_bbox, mask_image, get_config
 from model.networks import Generator
 
@@ -19,8 +18,13 @@ rng = np.random.default_rng(0)
 path_orig = Path(__file__).parent.resolve() / 'checkpoints' / 'boundary_1_256'
 
 models = ['in_94_coarseG_l1', 'in_94_coarseG_l1False', 'in_94_l1', 'in_94_lightweight']
+<<<<<<< HEAD
 # file = h5py.File('data/bnd_256/magfield_256_large.h5')
 # Maybe use the validation fields
+=======
+it_number = 400000
+
+>>>>>>> 540003803e22adcb3099d14176441fa7af53f05a
 file = h5py.File('data/magfield_val_256.h5')
 
 # Empty matrix so append errors (4 models, 5 performance tests: mse, psnr, mape, divergence, curl)
@@ -53,7 +57,7 @@ for model in models:
         # sample_check(x[0], v_max=plt_scale, filename = 'boundary_'+model)
 
         # Test last generator ran
-        last_model_name = Path(exp_path, 'gen_00400000.pt')
+        last_model_name = Path(exp_path, f'gen_00{str(it_number)}.pt')
         netG = Generator(config['netG'], config['coarse_G'], True, [0])
         netG.load_state_dict(torch.load(last_model_name))
         netG = nn.parallel.DataParallel(netG, device_ids=[0])
