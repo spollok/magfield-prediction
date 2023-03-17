@@ -3,6 +3,7 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 from torch import autograd
+from kornia.filters import SpatialGradient
 
 from model.networks import Generator, GlobalDis
 from utils.tools import get_model_list
@@ -59,7 +60,7 @@ class Trainer(nn.Module):
         l1_loss = nn.L1Loss()
         losses = {}
 
-        x1, x2 = self.netG(x, mask)
+        x1, x2, phi = self.netG(x, mask)
         if self.outpaint:
             if x1 is not None: x1_eval = x1
             x2_eval = x2
@@ -67,18 +68,20 @@ class Trainer(nn.Module):
             if x1 is not None: x1_eval = x1 * mask + x * (1. - mask)
             x2_eval = x2 * mask + x * (1. - mask)
         
+        # Groundtruth in terms of scalar potential
+        gt_phi = SpatialGradient(gt)
         # D part
         # wgan d loss
-        global_real_pred, global_fake_pred = self.dis_forward(self.globalD, gt, x2_eval.detach())
+        global_real_pred, global_fake_pred = self.dis_forward(self.globalD, gt_phi, phi.detach())
         losses['wgan_d'] = torch.mean(global_fake_pred - global_real_pred) * self.config['global_wgan_loss_alpha']
         # gradients penalty loss
-        global_penalty = self.calc_gradient_penalty(self.globalD, gt, x2_eval.detach())
+        global_penalty = self.calc_gradient_penalty(self.globalD, gt_phi, phi.detach())
         losses['wgan_gp'] = global_penalty
 
         # G part
         if compute_loss_g:
-            losses['l1'] = l1_loss(x2_eval, gt)
-            losses['ae'] = l1_loss(x2 * (1. - mask), gt * (1. - mask))
+            losses['l1'] = l1_loss(phi, gt_phi)
+            losses['ae'] = l1_loss(phi * (1. - mask), gt_phi * (1. - mask))
             if x1 is not None:
                 losses['l1'] += l1_loss(x1_eval, gt) * self.config['coarse_l1_alpha']
                 losses['ae'] += l1_loss(x1 * (1. - mask), gt * (1. - mask)) * self.config['coarse_l1_alpha']
@@ -121,7 +124,7 @@ class Trainer(nn.Module):
             global_real_pred, global_fake_pred = self.dis_forward(self.globalD, gt, x2_eval)
             losses['wgan_g'] = -torch.mean(global_fake_pred) * self.config['global_wgan_loss_alpha']
 
-        return losses, x2_eval, x2
+        return losses, x2_eval, x2, phi
 
     def dis_forward(self, netD, ground_truth, x_inpaint):
         assert ground_truth.size() == x_inpaint.size()

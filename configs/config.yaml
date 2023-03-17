@@ -50,9 +50,9 @@ curl_loss_alpha: 30000
 
 # network parameters
 netG:
-  input_dim: 3
+  input_dim: 2
   ngf: 32
 
 netD:
-  input_dim: 3
+  input_dim: 2
   ndf: 64
