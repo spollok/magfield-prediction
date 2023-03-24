@@ -115,7 +115,7 @@ class FineGenerator(nn.Module):
         self.allconv14 = gen_conv(cnum*2, cnum*2, 3, 1, 1)
         self.allconv15 = gen_conv(cnum*2, cnum, 3, 1, 1)
         self.allconv16 = gen_conv(cnum, cnum//2, 3, 1, 1)
-        self.allconv17 = gen_conv(cnum//2, input_dim, 3, 1, 1, activation='none')
+        self.allconv17 = gen_conv(cnum//2, 1, 3, 1, 1, activation='none')
 
     def forward(self, xin, x_stage1, mask):
         # For indicating the boundaries of images

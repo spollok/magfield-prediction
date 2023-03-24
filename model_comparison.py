@@ -18,13 +18,10 @@ rng = np.random.default_rng(0)
 path_orig = Path(__file__).parent.resolve() / 'checkpoints' / 'boundary_1_256'
 
 models = ['in_94_coarseG_l1', 'in_94_coarseG_l1False', 'in_94_l1', 'in_94_lightweight']
-<<<<<<< HEAD
 # file = h5py.File('data/bnd_256/magfield_256_large.h5')
 # Maybe use the validation fields
-=======
-it_number = 400000
+it_number = 600000
 
->>>>>>> 540003803e22adcb3099d14176441fa7af53f05a
 file = h5py.File('data/magfield_val_256.h5')
 
 # Empty matrix so append errors (4 models, 5 performance tests: mse, psnr, mape, divergence, curl)
