@@ -6,21 +6,26 @@ wandb/
 .vscode/
 
 # Data, Plots, and Results
-checkpoints/boundary_1_256/*
+# checkpoints/boundary_1_256/*
+checkpoints/boundary_1_256/in_94_coarseG_l1/*
 !checkpoints/boundary_1_256/in_94_coarseG_l1/config.yaml
-!checkpoints/boundary_1_256/in_94_coarseG_l1/gen00600000.pt
+!checkpoints/boundary_1_256/in_94_coarseG_l1/gen_00600000.pt
 
+checkpoints/boundary_1_256/in_94_coarseG_l1False/*
 !checkpoints/boundary_1_256/in_94_coarseG_l1False/config.yaml
-!checkpoints/boundary_1_256/in_94_coarseG_l1False/gen00600000.pt
+!checkpoints/boundary_1_256/in_94_coarseG_l1False/gen_00600000.pt
 
+checkpoints/boundary_1_256/in_94_l1/*
 !checkpoints/boundary_1_256/in_94_l1/config.yaml
-!checkpoints/boundary_1_256/in_94_l1/gen00600000.pt
+!checkpoints/boundary_1_256/in_94_l1/gen_00600000.pt
 
+checkpoints/boundary_1_256/in_94_lightweight/*
 !checkpoints/boundary_1_256/in_94_lightweight/config.yaml
-!checkpoints/boundary_1_256/in_94_lightweight/gen00600000.pt
+!checkpoints/boundary_1_256/in_94_lightweight/gen_00600000.pt
 
+checkpoints/boundary_1_256/in_div_curl_1_94_1/*
 !checkpoints/boundary_1_256/in_div_curl_1_94_1/config.yaml
-!checkpoints/boundary_1_256/in_div_curl_1_94_1/gen00600000.pt
+!checkpoints/boundary_1_256/in_div_curl_1_94_1/gen_00300000.pt
 
 checkpoints/paper/*/test
 data/*
