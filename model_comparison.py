@@ -74,7 +74,8 @@ for model in models:
         # Calculate performance of models
         diff = np.abs(orig - out_np)
         # mse_final = np.mean(diff**2)
-        mse_mat[j] = np.mean(diff**2)
+        # mse_mat[j] = np.mean(diff**2)
+        mse_mat[j] = np.mean(diff) #For MAE instead of MSE
         # if mse_mat[j] < 1e-4:
         #     psnr_mat[j] = 0
         # else:
