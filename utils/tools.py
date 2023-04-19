@@ -1,6 +1,7 @@
 import os
 import torch
 import numpy as np
+import random
 
 from torchvision.transforms.functional import crop
 from torchvision.transforms import RandomRotation
@@ -275,6 +276,18 @@ def mask_image(x, bboxes, config, bnd=None):
 
     return result, mask, original
 
+def random_bnd(mask, perc):
+
+    length = mask.shape[-1]
+    perc_array = np.ones([length*4])
+    perc_array[0:int(len(perc_array)*(perc/100))] = 0 
+    random.shuffle(perc_array)
+    mask[:,0,:] = perc_array[:length]
+    mask[:,-1,:] = perc_array[length:length*2]
+    mask[:,:,0] = perc_array[length*2:length*3]
+    mask[:,:,-1] = perc_array[length*3:]
+
+    return mask
 
 def patch_mask(config):
     height, width = config['mask_shape']
