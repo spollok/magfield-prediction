@@ -127,7 +127,7 @@ for perc in percentages:
 err_list = err_mat.tolist()
 for i, err_n in enumerate(err_str):
     err_list[i][0] = err_n
-print(tabulate(err_list, headers=['%']+str(percentages), tablefmt="grid", showindex=False))
+print(tabulate(err_list, headers=['%']+(percentages), tablefmt="grid", showindex=False))
 
 
 # %%
