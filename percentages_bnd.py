@@ -8,7 +8,7 @@ import torch
 import torch.nn as nn
 import h5py
 
-from utils.tools import random_bbox, mask_image, get_config, random_bnd
+from utils.tools import random_bbox, mask_image, get_config, random_bnd, random_bnd2
 from model.networks import Generator
 
 # Parameters
@@ -51,7 +51,9 @@ for perc in percentages:
         config = get_config(Path(exp_path, 'config.yaml'))
         bboxes = random_bbox(config, rng=rng)
         x, mask, orig = mask_image(np.array([field]), bboxes, config, bnd=config['boundary'])
-        mask = random_bnd(mask, perc)
+        # mask = random_bnd(mask, perc)
+        mask = random_bnd2(mask, perc)
+
         # print(x.shape)
         # Plot box made
         # sample_check(x[0], v_max=plt_scale, filename = 'boundary_'+model)

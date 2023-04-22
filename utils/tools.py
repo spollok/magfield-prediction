@@ -1,7 +1,6 @@
 import os
 import torch
 import numpy as np
-import random
 
 from torchvision.transforms.functional import crop
 from torchvision.transforms import RandomRotation
@@ -153,6 +152,33 @@ def random_bbox(config, distributed=False, rng=None):
 
     return torch.tensor(bbox_list, dtype=torch.int64) # pylint: disable=E1102
 
+def random_bnd(mask, perc):
+
+    length = mask.shape[-1]
+    perc_array = np.ones([length*4])
+    perc_array[0:int(len(perc_array)*(perc/100))] = 0 
+    np.random.shuffle(perc_array)
+    mask[:,0,:] = perc_array[:length]
+    mask[:,-1,:] = perc_array[length:length*2]
+    mask[:,:,0] = perc_array[length*2:length*3]
+    mask[:,:,-1] = perc_array[length*3:]
+
+    return mask
+
+def random_bnd2(mask, perc):
+
+    length = mask.shape[-1]
+    prob = 0.1
+    rng = np.random.default_rng()
+    perc_array = rng.choice([0, 1], size=(4, 96), p=[prob, 1 - prob])
+    mask[:,:,0,:] = perc_array[0,:]
+    mask[:,:,-1,:] = perc_array[1,:]
+    mask[:,:,:,0] = perc_array[2,:]
+    mask[:,:,:,-1] = perc_array[3,:]
+
+    return mask
+
+
 # bboxes is the output from random_bbox (torch.tensor)
 def bbox2mask(bboxes, height, width, max_delta_h, max_delta_w, bnd, outpaint=False):
     batch_size = bboxes.size(0)
@@ -276,18 +302,6 @@ def mask_image(x, bboxes, config, bnd=None):
 
     return result, mask, original
 
-def random_bnd(mask, perc):
-
-    length = mask.shape[-1]
-    perc_array = np.ones([length*4])
-    perc_array[0:int(len(perc_array)*(perc/100))] = 0 
-    random.shuffle(perc_array)
-    mask[:,0,:] = perc_array[:length]
-    mask[:,-1,:] = perc_array[length:length*2]
-    mask[:,:,0] = perc_array[length*2:length*3]
-    mask[:,:,-1] = perc_array[length*3:]
-
-    return mask
 
 def patch_mask(config):
     height, width = config['mask_shape']
