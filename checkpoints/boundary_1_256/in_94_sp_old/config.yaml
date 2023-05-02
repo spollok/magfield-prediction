@@ -1,0 +1,60 @@
+# data parameters
+dataset_name: boundary_1_256
+train_data: magfield_symm_256.h5
+val_data: magfield_symm_val_256.h5
+test: False
+resume:
+batch_size: 150
+image_shape: [2, 256, 256]
+mask_shape: [94, 94]
+mask_batch_same: True
+max_delta_shape: [16,16]
+margin: [4, 4]
+div_loss: True
+curl_loss: True
+msp_loss: False
+coarse_G: False
+wandb: True
+x2_bnd: True
+exp_name: 'in_94_sp'
+
+# Costum parameter for magnetic field prediction
+boundary: 1
+box_amount: 1
+box_patch: 4
+mode: inpaint
+outpaint: False
+scale_factor: 1
+
+# training parameters
+cuda: True
+gpu_ids: [0]
+num_workers: 10
+lr: 0.0001
+beta1: 0.5
+beta2: 0.9
+n_critic: 5
+niter: 500000
+print_iter: 5000
+viz_iter: 5000
+snapshot_save_iter: 20000
+valid_iter: 2500
+
+# loss weight
+coarse_l1_alpha: 1.2
+l1_loss_alpha: 3.6
+ae_loss_alpha: 7.2
+global_wgan_loss_alpha: 1.
+gan_loss_alpha: 0.001
+wgan_gp_lambda: 10
+div_loss_alpha: 500
+curl_loss_alpha: 30000
+
+# network parameters
+netG:
+  input_dim: 2
+  ngf: 32
+
+netD:
+  input_dim: 2
+  ndf: 64
