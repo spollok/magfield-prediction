@@ -155,13 +155,15 @@ def random_bbox(config, distributed=False, rng=None):
 def random_bnd(mask, perc):
 
     length = mask.shape[-1]
-    perc_array = np.ones([length*4])
+    perc_array = torch.ones([length*4])
     perc_array[0:int(len(perc_array)*(perc/100))] = 0 
-    np.random.shuffle(perc_array)
-    mask[:,0,:] = perc_array[:length]
-    mask[:,-1,:] = perc_array[length:length*2]
-    mask[:,:,0] = perc_array[length*2:length*3]
-    mask[:,:,-1] = perc_array[length*3:]
+    # np.random.shuffle(perc_array)
+    r = torch.randperm(perc_array.shape[0])
+    perc_array = perc_array[r]
+    mask[:,:,0,:] = perc_array[:length]
+    mask[:,:,-1,:] = perc_array[length:length*2]
+    mask[:,:,:,0] = perc_array[length*2:length*3]
+    mask[:,:,:,-1] = perc_array[length*3:]
 
     return mask
 
@@ -278,10 +280,11 @@ def local_patch(x, bboxes, s, outpaint, mode):
     return torch.stack(patches, dim=0).reshape(-1, x.shape[1], h_patch, w_patch)
 
 
-def mask_image(x, bboxes, config, bnd=None):
+def mask_image(x, bboxes, config, bnd=None, perc = 100):
     _, height, width = config['image_shape']
     max_delta_h, max_delta_w = config['max_delta_shape']
     mask = bbox2mask(bboxes, height, width, max_delta_h, max_delta_w, bnd, config['outpaint'])
+    mask = random_bnd(mask, perc=perc)
     if type(x) != np.ndarray:
         if x.is_cuda:
             mask = mask.cuda()

@@ -35,6 +35,10 @@ checkpoints/boundary_1_256/in_94_2D/*
 !checkpoints/boundary_1_256/in_94_2D/config.yaml
 !checkpoints/boundary_1_256/in_94_2D/gen_00500000.pt
 
+checkpoints/boundary_1_256/in_94_sp/*
+!checkpoints/boundary_1_256/in_94_sp/config.yaml
+!checkpoints/boundary_1_256/in_94_sp/gen_00500000.pt
+
 checkpoints/paper/*/test
 data/*
 # !data/bnd_256
